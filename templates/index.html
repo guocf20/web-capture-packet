@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Packet Capture</title>
+
+
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Packet Capture</h1>
+<script>
+var stop_time
+function myTimer() {
+	stop_time-=1;
+	if (stop_time <  0){
+		document.getElementById("stop_time").innerHTML="capture finished";
+		clearInterval(myVar);
+		return;
+	}
+	document.getElementById("stop_time").innerHTML="capture will be stop after " + stop_time + " second";
+}
+</script>
+    <div id="stop_time">capture will be stop after during second</div>
+    <form id="capture_form" method="POST" action="/start_capture">
+    <!---form id="capture_form"-->
+    
+        <label for="ip">IP address:</label>
+        <input type="text" id="ip" name="ip"><br><br>
+
+        <label for="port">Port:</label>
+        <input type="text" id="port" name="port"><br><br>
+
+        <label for="duration">Duration (in seconds):</label>
+        <input id = "capture_time" type="text" id="duration" name="duration"><br><br>
+
+        <input type="submit" value="Start Capture">
+    </form>
+  <div id="response"></div>
+    <form id = "stop_form" method="GET" action="/stop_capture">
+        <input type="submit" value="Stop Capture">
+    </form>
+
+    <form method="GET" action="/download_capture">
+        <input type="submit" value="Download Capture">
+    </form>
+    	<script>
+		$(document).ready(function() {
+			$("#capture_form").submit(function(e) {
+				e.preventDefault(); // 阻止默认的表单提交行为
+				$.ajax({
+					url: "{{ url_for('start_capture') }}",
+					method: "POST",
+					data: $(this).serialize(),
+					success: function(response) {
+						  $('#response').html(response.name + ' capture successfully!');
+						   stop_time = document.getElementById('capture_time').value;
+						  var myVar = setInterval(function(){ myTimer() }, 1000);
+					},
+					error: function(xhr) {
+						alert("Error: " + xhr.responseText); // 显示错误消息
+					}
+				});
+			});
+		});
+
+
+		$(document).ready(function() {
+			$("#stop_form").submit(function(e) {
+				e.preventDefault(); // 阻止默认的表单提交行为
+				$.ajax({
+					url: "{{ url_for('stop_capture') }}",
+					method: "GET",
+					data: $(this).serialize(),
+					success: function(response) {
+						  $('#response').html(response.name + ' stop successfully!');
+					},
+					error: function(xhr) {
+						alert("Error: " + xhr.responseText); // 显示错误消息
+					}
+				});
+			});
+		});
+
+
+
+	</script>
+</body>
+</html>
+
